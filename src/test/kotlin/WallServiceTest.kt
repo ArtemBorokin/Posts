@@ -15,7 +15,7 @@ class WallServiceTest {
 
         if (post.id == 0) test = false
 
-        assertEquals(test, true)
+        assertTrue(test)
     }
 
     @Test
@@ -26,7 +26,7 @@ class WallServiceTest {
 
         test = WallService.update(updatePost)
 
-        assertEquals(test, true)
+        assertTrue(test)
     }
 
     @Test
@@ -37,6 +37,6 @@ class WallServiceTest {
 
         test = WallService.update(updatePost)
 
-        assertEquals(test, false)
+        assertFalse(test)
     }
 }

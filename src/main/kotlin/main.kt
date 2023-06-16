@@ -58,10 +58,10 @@ data class Likes(
 
 object WallService {
     private var posts = emptyArray<Post>()
+    var postId = 0
 
     fun add(post: Post): Post {
-        val postId = posts.hashCode()
-        posts += post.copy(id = postId)
+        posts += post.copy(id = ++postId)
         return posts.last()
     }
 
