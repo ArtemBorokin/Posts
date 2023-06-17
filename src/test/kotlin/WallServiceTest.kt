@@ -18,33 +18,23 @@ class WallServiceTest {
     fun add() {
         val post = WallService.add(Post(comment = Comment(), likes = Likes()))
         var test = true
-
         if (post.id == 0) test = false
-
         assertTrue(test)
     }
 
     @Test
     fun updateTrue() {
-        //val post = WallService.add(Post(text = "being", comment = Comment(), likes = Likes()))
         var test = true
         val updatePost = Post(text = "end", comment = Comment(), likes = Likes(), id = 1)
-        //val updatePost = post.copy(text = "end")
-
         test = WallService.update(updatePost)
-
         assertTrue(test)
     }
 
     @Test
     fun updateFalse() {
-        //val post = Post(text = "being", comment = Comment(), likes = Likes())
         var test = true
         val updatePost = Post(text = "end", comment = Comment(), likes = Likes(), id = 99)
-        //val updatePost = post.copy(text = "end")
-
         test = WallService.update(updatePost)
-
         assertFalse(test)
     }
 }

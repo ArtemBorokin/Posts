@@ -83,10 +83,6 @@ object WallService {
 
     fun clear() {
         WallService.posts = emptyArray()
-    }
-
-    object WallService {
-        var posts = emptyArray<Post>()
-
+        postId = 0
     }
 }
