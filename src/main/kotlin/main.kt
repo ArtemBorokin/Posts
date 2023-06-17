@@ -80,4 +80,13 @@ object WallService {
             println("${posts[i - 1].id}   ${posts[i - 1].text}    ${posts[i - 1].data}")
         }
     }
+
+    fun clear() {
+        WallService.posts = emptyArray()
+    }
+
+    object WallService {
+        var posts = emptyArray<Post>()
+
+    }
 }
