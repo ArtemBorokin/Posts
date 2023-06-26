@@ -2,29 +2,27 @@ package ru.netology
 
 fun main() {
 
-    var post1 = WallService.add(Post(1, 2, 3, 4, 5, "Раз", 7, 8, true, Comment(9), Likes(10)))
-    var post2 = WallService.add(Post(2, 2, 3, 4, 5, "Два", 7, 8, true, Comment(9), Likes(10)))
-    var post3 = WallService.add(Post(3, 2, 3, 4, 5, "Три", 7, 8, true, Comment(9), Likes(10)))
-    var post4 = Post(3, 2, 3, 4, 5, "пост не с этой страницы", 7, 8, true, Comment(), Likes())
+    val post1 = WallService.add(Post(1, 2, 3, 4, 5, "Раз", 7, 8, true, emptyArray(), Likes()))
+    val post2 = WallService.add(Post(2, 2, 3, 4, 5, "Два", 7, 8, true, emptyArray(), Likes()))
+    val post3 = WallService.add(Post(3, 2, 3, 4, 5, "Три", 7, 8, true, emptyArray(), Likes(10)))
+    val post4 = Post(3, 2, 3, 4, 5, "пост не с этой страницы", 7, 8, true, emptyArray(), Likes())
 
-    WallService.printPost()
+    val comment1 = WallService.createComment(post1.id, Comment(text = "Я"))
+    val comment2 = WallService.createComment(post1.id, Comment(text = "не привязан"))
+    val comment3 = WallService.createComment(post1.id, Comment(text = "к посту!"))
 
-    post1 = post1.copy(text = "Четыре")
-    WallService.update(post1)
+    WallService.printComments()
 
-    post2 = post2.copy(ownerId = 500, text = "Пять")
-    WallService.update(post2)
+    val reportComment1 = WallService.createReportComment(ReportComment(1, comment1.id, 1))
+    // не существующий пост
+    //val reportComment2 = WallService.createReportComment(ReportComment(1, 0, 0))
 
-    post3 = post3.copy(text = "Шесть", data = 10)
-    WallService.update(post3)
+    // не существующий индекс жалобы
+    //val reportComment3 = WallService.createReportComment(ReportComment(1, comment1.id, 9))
 
-    post4 = post4.copy(text = "Семь", data = 10) // Этот пост не выведется
-    WallService.update(post4)
+    WallService.printReportComment()
 
-    WallService.printPost()
-
-    println(WallService.update(post4))
-
+    WallService.createComment(post4.id, Comment(text = "Ошибка!"))
 }
 
 data class Post(
@@ -37,17 +35,48 @@ data class Post(
     val replyOwnerId: Int = 0,
     val replyPostId: Int = 0,
     val friendsOnly: Boolean = false,
-    val comment: Comment,
-    val likes: Likes
+    val comment: Array<Any> = emptyArray(),
+    val likes: Likes,
+    var attachment: Array<Attachment> = emptyArray()
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Post
+
+        if (!attachment.contentEquals(other.attachment)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return attachment.contentHashCode()
+    }
+}
+
+data class ReportComment(
+    val ownerId: Int = 0,
+    val commentId: Int = 0,
+    val reason: Int = 0
 )
 
+
 data class Comment(
-    val count: Int = 0,
-    val canPost: Boolean = true,
-    val groupsCanPost: Boolean = true,
-    val canClose: Boolean = true,
-    val canOpen: Boolean = true
+    val id: Int = 0,
+    val fromId: Int = 0,
+    val date: Int = 0,
+    val text: String = "",
+    val donut: Boolean = true,
+    val replyToUser: Int = 0,
+    val attachment: String = "",
+    val parentsStack: Int = 0,
+    val thread: String = ""
 )
+
+class PostNotFoundException(message: String) : RuntimeException(message)
+
+class CommentNotFoundException(message: String) : RuntimeException(message)
 
 data class Likes(
     val count: Int = 0,
@@ -58,10 +87,33 @@ data class Likes(
 
 object WallService {
     private var posts = emptyArray<Post>()
-    var postId = 0
+    private var comments = emptyArray<Comment>()
+    private var reportComments = emptyArray<ReportComment>()
+
+    fun createComment(postId: Int, comment: Comment): Comment {
+        for (post in posts)
+            if (post.id == postId) {
+                val commentId = comment.hashCode()
+                comments += comment.copy(id = commentId)
+                return comments.last()
+            }
+        throw PostNotFoundException("Post not found!")
+    }
+
+    fun createReportComment(reportComment: ReportComment): ReportComment {
+        if (reportComment.reason in 0..8) {
+            for (comment in comments)
+                if (comment.id == reportComment.commentId) {
+                    reportComments += reportComment
+                    return reportComments.last()
+                }
+        }
+        throw CommentNotFoundException("Error in the comment complaint")
+    }
 
     fun add(post: Post): Post {
-        posts += post.copy(id = ++postId)
+        val postId = posts.hashCode()
+        posts += post.copy(id = postId)
         return posts.last()
     }
 
@@ -77,12 +129,27 @@ object WallService {
 
     fun printPost() {
         for (i in 1..posts.size) {
-            println("${posts[i - 1].id}   ${posts[i - 1].text}    ${posts[i - 1].data}")
+            println("${posts[i - 1].id}   ${posts[i - 1].text}     ${posts[i - 1].comment} ")
         }
+    }
+
+    fun printAttachment(post: Post) {
+        for (i in 1..post.attachment.size)
+            println("${post.id} ${post.attachment[i - 1]} ")
+    }
+
+    fun printComments() {
+        for (i in 1..(comments.size))
+            println(comments[i - 1].text)
+    }
+
+    fun printReportComment() {
+        for (i in 1..reportComments.size)
+            println(reportComments[i - 1])
     }
 
     fun clear() {
         WallService.posts = emptyArray()
-        postId = 0
+        var postId = 0
     }
 }
