@@ -1,155 +1,330 @@
 package ru.netology
 
 fun main() {
+    //проверка лайков
+    val post = Post(
+        authorId = 1,
+        authorName = "Alex",
+        text = "dsgssdgedgbdbed",
+        original = null,
+        comments = null,
+        reposts = null,
+        copyHistory = null
+    )
+    WallService.add(post)
+    val post1 = Post(
+        authorId = 35,
+        authorName = "Petrovych",
+        text = "sldg elrbjl trjbn khtkj gskul",
+        original = null,
+        comments = null,
+        reposts = null,
+        copyHistory = null
+    )
+    var post2 = Post(
+        authorId = 12,
+        authorName = "Kolya Usypov",
+        text = "Привет",
+        comments = null,
+        original = post1,
+        reposts = null,
+        copyHistory = null
+    )
+    WallService.add(post1)
 
-    val post1 = WallService.add(Post(1, 2, 3, 4, 5, "Раз", 7, 8, true, emptyArray(), Likes()))
-    val post2 = WallService.add(Post(2, 2, 3, 4, 5, "Два", 7, 8, true, emptyArray(), Likes()))
-    val post3 = WallService.add(Post(3, 2, 3, 4, 5, "Три", 7, 8, true, emptyArray(), Likes(10)))
-    val post4 = Post(3, 2, 3, 4, 5, "пост не с этой страницы", 7, 8, true, emptyArray(), Likes())
+    WallService.likeById(post1.id)
+    WallService.likeById(post1.id)
+    WallService.likeById(post2.id)
+    WallService.likeById(post1.id)
+    WallService.likeById(post1.id)
 
-    val comment1 = WallService.createComment(post1.id, Comment(text = "Я"))
-    val comment2 = WallService.createComment(post1.id, Comment(text = "не привязан"))
-    val comment3 = WallService.createComment(post1.id, Comment(text = "к посту!"))
+    //println(WallService.getPostString())
 
-    WallService.printComments()
 
-    val reportComment1 = WallService.createReportComment(ReportComment(1, comment1.id, 1))
-    // не существующий пост
-    //val reportComment2 = WallService.createReportComment(ReportComment(1, 0, 0))
+    println("----------------------")
+    //println(WallService.getPostString())
 
-    // не существующий индекс жалобы
-    //val reportComment3 = WallService.createReportComment(ReportComment(1, comment1.id, 9))
+    WallService.add(post2)
+    WallService.likeById(post2.id)
+    WallService.likeById(post1.id)
+    println("----------------------")
+    //WallService.getPostString()
 
-    WallService.printReportComment()
+    var attach: Array<Attachments> = emptyArray()
+    attach += Audio(1, 1, "Pevec", "title", 305, "url", 5, 2, 3, 0, false, true)
 
-    WallService.createComment(post4.id, Comment(text = "Ошибка!"))
+    attach += Photo(3, 5, "130", "604")
+
+    WallService.update(post2.copy(attachments = attach))
+    //WallService.getPostString(post2.id)
+
+    WallService.getPostAttach(post2.id)
+
+}
+
+object CorrectId {
+    private var lastId = 0
+    //смотрим в то место где у нас хранятся id постов и выдаём свободный
+
+    fun getNewId(id: Int): Int {
+        if (id == 0) {
+            lastId += 1
+            return lastId
+        }
+
+        return 0
+    }
+
+    fun clearId() {
+        lastId = 0
+    }
 }
 
 data class Post(
-    val id: Int = 0,
-    val ownerId: Int = 0,
-    val fromId: Int = 0,
-    val createdBy: Int = 0,
-    val data: Int = 0,
-    val text: String = " ",
-    val replyOwnerId: Int = 0,
-    val replyPostId: Int = 0,
+    val id: Int = CorrectId.getNewId(0),
+    val original: Post?,
+    val ownerId: Int = 0,       //Идентификатор владельца стены, на которой размещена запись.
+    val fromId: Int = 0,        //Идентификатор автора записи (от чьего имени опубликована запись).
+    val date: Int = 0,   //Время публикации записи в формате unixtime.
+    val replyOwnerId: Int = 0, //Идентификатор владельца записи, в ответ на которую была оставлена текущая.
+    val replyPostId: Int = 0,  //Идентификатор записи, в ответ на которую была оставлена текущая.
+    val canDelete: Boolean = false, // Информация о том, может ли текущий пользователь удалить запись (1 — может, 0 — не может).
+    val isPinned: Boolean = false, // Информация о том, что запись закреплена.
+    val markedAsAds: Boolean = false, // Информация о том, содержит ли запись отметку "реклама" (1 — да, 0 — нет).
+    val isFavorite: Boolean = false, // true, если объект добавлен в закладки у текущего пользователя.
+    val postponedId: Int = 0, // Идентификатор отложенной записи. Это поле возвращается тогда, когда запись стояла на таймере.
+    val postType: String = "post", //String  Тип записи, может принимать следующие значения: post, copy, reply, postpone, suggest.
+    val signerId: Int = 0, //Идентификатор автора, если запись была опубликована от имени сообщества и подписана пользователем;
+    val copyHistory: CopyHistory?,
+    val views: Views = Views(),
+    val comments: Comments?,
+    val copyright: Copyright = Copyright(),
+    val reposts: Reposts?,
+    val geo: Geo = Geo(),
+    val donut: Donut = Donut(),
+    val authorId: Int,
+    val authorName: String,
+    val text: String,
+    val likes: Likes = Likes(),
     val friendsOnly: Boolean = false,
-    val comment: Array<Any> = emptyArray(),
-    val likes: Likes,
-    var attachment: Array<Attachment> = emptyArray()
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+    val canPin: Boolean = false,
+    val canEdit: Boolean = true,
+    val attachments: Array<Attachments> = emptyArray()
+)
 
-        other as Post
+//interface Attachments {
+abstract class Attachments
 
-        if (!attachment.contentEquals(other.attachment)) return false
+class AttachPhoto(
+    val type: String = "photo"
+)
 
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return attachment.contentHashCode()
+class Photo(
+    val id: Int, //Идентификатор фотографии.
+    val ownerId: Int, //Идентификатор владельца фотографии.
+    val photo130: String, //URL изображения для предпросмотра.
+    val photo604: String, //URL полноразмерного изображения.
+    val photo: AttachPhoto = AttachPhoto()
+) : Attachments() {
+    override fun toString(): String {
+        return "type: ${photo.type}, id: $id, photo130: $photo130, photo604: $photo604"
     }
 }
 
-data class ReportComment(
-    val ownerId: Int = 0,
-    val commentId: Int = 0,
-    val reason: Int = 0
+class AttachAudio(
+    val type: String = "audio"
+)
+
+class Audio(
+    val id: Int, //Идентификатор аудиозаписи.
+    val ownerId: Int, //Идентификатор владельца аудиозаписи.
+    val artist: String, //Исполнитель
+    val title: String, //Название композиции.
+    val duration: Int, //Длительность аудиозаписи в секундах.
+    val url: String, //Ссылка на mp3.
+    val lyricsId: Int, //Идентификатор текста аудиозаписи (если доступно).
+    val albumId: Int, //Идентификатор альбома, в котором находится аудиозапись (если присвоен).
+    val genreId: Int, //Идентификатор жанра из списка аудио жанров.
+    val date: Int, //Дата добавления.
+    val noSearch: Boolean, //если включена опция «Не выводить при поиске». Если опция отключена, поле не возвращается.
+    val isHq: Boolean, // если аудио в высоком качестве.
+    val audio: AttachAudio = AttachAudio()
+) : Attachments() {
+    override fun toString(): String {
+        return "type: ${audio.type}, id: $id, artist: $artist, title: $title"
+    }
+}
+
+class AttachVideo(
+    val type: String = "video"
+)
+
+open class Video(
+    val id: Int, //видеозаписи
+    val ownerId: Int, //Идентификатор владельца видеозаписи.
+    val title: String, //Название видеозаписи.
+    val description: String, //Текст описания видеозаписи.
+    val duration: String, //Длительность ролика  в секундах.
+    val date: Int, //Дата создания видеозаписи в формате Unixtime.
+    val comments: Int, //Количество комментариев к видеозаписи.
+    val isPrivate: Boolean = true, //Поле возвращается, если видеозапись приватная (например, была загружена в личное сообщение), всегда содержит 1.
+    val video: AttachVideo = AttachVideo()
+) : Attachments() {
+    override fun toString(): String {
+        return "type: ${video.type}, id: $id, title: $title, description: $description"
+    }
+}
+
+class AttachGraffiti(
+    val type: String = "graffiti"
+)
+
+class Graffiti(
+    val id: Int, //идентификатор граффити
+    val ownerId: Int, //Идентификатор автора граффити.
+    val photo130: String, //URL изображения для предпросмотра.
+    val photo604: String, //URL полноразмерного изображения.
+    val graffiti: AttachGraffiti = AttachGraffiti()
+) : Attachments() {
+    override fun toString(): String {
+        return "type: ${graffiti.type}, id: $id, photo130: $photo130, photo604: $photo604"
+    }
+}
+
+class AttachVikiPage(
+    val type: String = "page"
+)
+
+open class VikiPage(
+    val id: Int, //идентификатор вики-страницы.
+    val vikiPage: AttachVikiPage = AttachVikiPage(),
+    val groupId: Int, //Идентификатор группы, которой принадлежит вики-страница.
+    val title: String //Название вики-страницы.
+) : Attachments() {
+    override fun toString(): String {
+        return "type: ${vikiPage.type}, id: $id, title: $title"
+    }
+}
+
+data class Donut(
+    var isDonut: Boolean = false,
+    var paidDuration: Int = 100,
+    var canPublishFreeCopy: Boolean = true,
+    val placeholder: Placeholder = Placeholder(),
+    var editMode: String = "duration"
+)
+
+data class Placeholder(
+    var name: String = "Смотрим на меня"
+)
+
+data class Reposts(
+    var count: Int = 0,
+    var userReposted: Boolean = false
+)
+
+data class Geo(
+    val type: String = "", //Фонтан
+    val coordinates: String = "", //"56.008772, 92.870401"
+    val place: Places = Places()
+)
+
+data class Places(
+    val name: String = ""//"Главный фонтан на Театральной площади г. Красноярска"
+)
+
+data class Comments(
+    var count: Int = 0,
+    var canPost: Boolean = true,
+    var groupsCanPost: Boolean = true,
+    var canClose: Boolean = false,
+    var canOpen: Boolean = true
+)
+
+data class Copyright(
+    val id: Int = 0, //тупо 0 потому что мы всего-лишьи имитируем ссылку извне
+    val link: String = "",
+    val name: String = "",
+    val type: String = ""
 )
 
 
-data class Comment(
-    val id: Int = 0,
-    val fromId: Int = 0,
-    val date: Int = 0,
-    val text: String = "",
-    val donut: Boolean = true,
-    val replyToUser: Int = 0,
-    val attachment: String = "",
-    val parentsStack: Int = 0,
-    val thread: String = ""
+data class Views(var count: Int = 0)
+
+data class CopyHistory(
+    var posts: Array<Post> = emptyArray()
 )
-
-class PostNotFoundException(message: String) : RuntimeException(message)
-
-class CommentNotFoundException(message: String) : RuntimeException(message)
 
 data class Likes(
-    val count: Int = 0,
-    val userLikes: Boolean = false,
-    val canLike: Boolean = true,
-    val canPublish: Boolean = true
+    var count: Int = 0,
+    var userLikes: Boolean = false,
+    var canLike: Boolean = true
 )
 
 object WallService {
     private var posts = emptyArray<Post>()
-    private var comments = emptyArray<Comment>()
-    private var reportComments = emptyArray<ReportComment>()
 
-    fun createComment(postId: Int, comment: Comment): Comment {
-        for (post in posts)
-            if (post.id == postId) {
-                val commentId = comment.hashCode()
-                comments += comment.copy(id = commentId)
-                return comments.last()
-            }
-        throw PostNotFoundException("Post not found!")
-    }
-
-    fun createReportComment(reportComment: ReportComment): ReportComment {
-        if (reportComment.reason in 0..8) {
-            for (comment in comments)
-                if (comment.id == reportComment.commentId) {
-                    reportComments += reportComment
-                    return reportComments.last()
-                }
+    fun getPostString(id: Int = 0) {
+        when (id) {
+            0 -> for (i in posts) println(i.toString())
+            else -> for (i in posts) if (i.id == id) println(i.toString())
         }
-        throw CommentNotFoundException("Error in the comment complaint")
-    }
 
-    fun add(post: Post): Post {
-        val postId = posts.hashCode()
-        posts += post.copy(id = postId)
-        return posts.last()
-    }
-
-    fun update(post: Post): Boolean {
-        var canUpdate = false
-        for ((i, updatedPost) in posts.withIndex())
-            if (post.id == updatedPost.id) {
-                posts[i] = post.copy(ownerId = updatedPost.ownerId, data = updatedPost.data)
-                canUpdate = true
-            }
-        return canUpdate
-    }
-
-    fun printPost() {
-        for (i in 1..posts.size) {
-            println("${posts[i - 1].id}   ${posts[i - 1].text}     ${posts[i - 1].comment} ")
-        }
-    }
-
-    fun printAttachment(post: Post) {
-        for (i in 1..post.attachment.size)
-            println("${post.id} ${post.attachment[i - 1]} ")
-    }
-
-    fun printComments() {
-        for (i in 1..(comments.size))
-            println(comments[i - 1].text)
-    }
-
-    fun printReportComment() {
-        for (i in 1..reportComments.size)
-            println(reportComments[i - 1])
     }
 
     fun clear() {
-        WallService.posts = emptyArray()
-        var postId = 0
+        CorrectId.clearId()
+        posts = emptyArray()
     }
+
+    fun add(post: Post): Post {
+        posts += post
+        return posts.last()
+    }
+
+    fun getPostAttach(id: Int) {
+        when (id) {
+            0 -> {
+                println("У вас отсутствует корректный id поста.")
+            }
+
+            else -> {
+                for (i in posts) {
+                    if (i.id == id) {
+                        for (attach in i.attachments)
+                            when (attach) {
+                                is Audio -> println("audio:  $attach")
+                                is Photo -> println("photo:  $attach")
+                                is VikiPage -> println("viki page:  $attach")
+                                is Video -> println("video:  $attach")
+                                is Graffiti -> println("graffiti:  $attach")
+                            }
+                    }
+                }
+            }
+        }
+
+    }
+
+    fun update(post: Post): Boolean {
+        for ((index, i) in posts.withIndex()) {
+            if (i.id == post.id) {
+                posts[index] = post.copy(
+                    authorName = post.authorName, text = post.text, likes = i.likes, friendsOnly = post.friendsOnly,
+                    canPin = post.canPin, canEdit = post.canEdit
+                )
+                return true
+            }
+        }
+        return false
+    }
+
+    fun likeById(id: Int) {
+        for ((index, post) in posts.withIndex()) {
+            if (post.id == id) {
+                posts[index] = post.copy(likes = Likes(post.likes.count + 1, post.likes.userLikes, post.likes.canLike))
+            }
+        }
+    }
+
 }
