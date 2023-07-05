@@ -115,27 +115,29 @@ data class Post(
 //interface Attachments {
 abstract class Attachments
 
-class AttachPhoto(
-    val type: String = "photo"
-)
+data class AttachPhoto(
+    val type: String = "photo",
+    val photo: Photo
+) : Attachments()
 
-class Photo(
+data class Photo(
     val id: Int, //Идентификатор фотографии.
     val ownerId: Int, //Идентификатор владельца фотографии.
     val photo130: String, //URL изображения для предпросмотра.
     val photo604: String, //URL полноразмерного изображения.
     val photo: AttachPhoto = AttachPhoto()
-) : Attachments() {
+) {
     override fun toString(): String {
         return "type: ${photo.type}, id: $id, photo130: $photo130, photo604: $photo604"
     }
 }
 
-class AttachAudio(
-    val type: String = "audio"
-)
+data class AttachAudio(
+    val type: String = "audio",
+    val audio: Audio
+) : Attachments()
 
-class Audio(
+data class Audio(
     val id: Int, //Идентификатор аудиозаписи.
     val ownerId: Int, //Идентификатор владельца аудиозаписи.
     val artist: String, //Исполнитель
@@ -155,11 +157,12 @@ class Audio(
     }
 }
 
-class AttachVideo(
-    val type: String = "video"
-)
+data class AttachVideo(
+    val type: String = "video",
+    val video: Video
+) : Attachments()
 
-open class Video(
+data class Video(
     val id: Int, //видеозаписи
     val ownerId: Int, //Идентификатор владельца видеозаписи.
     val title: String, //Название видеозаписи.
@@ -175,11 +178,12 @@ open class Video(
     }
 }
 
-class AttachGraffiti(
-    val type: String = "graffiti"
-)
+data class AttachGraffiti(
+    val type: String = "graffiti",
+    val graffiti: Graffiti
+) : Attachments()
 
-class Graffiti(
+data class Graffiti(
     val id: Int, //идентификатор граффити
     val ownerId: Int, //Идентификатор автора граффити.
     val photo130: String, //URL изображения для предпросмотра.
@@ -191,11 +195,12 @@ class Graffiti(
     }
 }
 
-class AttachVikiPage(
-    val type: String = "page"
-)
+data class AttachVikiPage(
+    val type: String = "page",
+    val vikiPage: VikiPage
+) : Attachments()
 
-open class VikiPage(
+data class VikiPage(
     val id: Int, //идентификатор вики-страницы.
     val vikiPage: AttachVikiPage = AttachVikiPage(),
     val groupId: Int, //Идентификатор группы, которой принадлежит вики-страница.
