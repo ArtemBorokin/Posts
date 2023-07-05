@@ -51,9 +51,9 @@ fun main() {
     //WallService.getPostString()
 
     var attach: Array<Attachments> = emptyArray()
-    attach += Audio(1, 1, "Pevec", "title", 305, "url", 5, 2, 3, 0, false, true)
+    attach += AttachAudio(1, 1, "Pevec", "title", 305, "url", 5, 2, 3, 0, false, true)
 
-    attach += Photo(3, 5, "130", "604")
+    attach += AttachPhoto(3, 5, "130", "604")
 
     WallService.update(post2.copy(attachments = attach))
     //WallService.getPostString(post2.id)
@@ -120,7 +120,7 @@ abstract class Attachments(val type: String)
     //val photo: Photo
 //) : Attachments("photo")
 
-data class Photo(
+data class AttachPhoto(
     val id: Int, //Идентификатор фотографии.
     val ownerId: Int, //Идентификатор владельца фотографии.
     val photo130: String, //URL изображения для предпросмотра.
@@ -137,7 +137,7 @@ data class Photo(
     //val audio: Audio
 //) : Attachments("audio")
 
-data class Audio(
+data class AttachAudio(
     val id: Int, //Идентификатор аудиозаписи.
     val ownerId: Int, //Идентификатор владельца аудиозаписи.
     val artist: String, //Исполнитель
@@ -162,7 +162,7 @@ data class Audio(
     //val video: Video
 //) : Attachments("video")
 
-data class Video(
+data class AttachVideo(
     val id: Int, //видеозаписи
     val ownerId: Int, //Идентификатор владельца видеозаписи.
     val title: String, //Название видеозаписи.
@@ -183,7 +183,7 @@ data class Video(
     //val graffiti: Graffiti
 //) : Attachments("audio")
 
-data class Graffiti(
+data class AttachGraffiti(
     val id: Int, //идентификатор граффити
     val ownerId: Int, //Идентификатор автора граффити.
     val photo130: String, //URL изображения для предпросмотра.
@@ -200,7 +200,7 @@ data class Graffiti(
     //val vikiPage: VikiPage
 //) : Attachments("vikipage")
 
-data class VikiPage(
+data class AttachVikiPage(
     val id: Int, //идентификатор вики-страницы.
     //val vikiPage: AttachVikiPage,
     val groupId: Int, //Идентификатор группы, которой принадлежит вики-страница.
@@ -298,11 +298,11 @@ object WallService {
                     if (i.id == id) {
                         for (attach in i.attachments)
                             when (attach) {
-                                is Audio -> println("audio:  $attach")
-                                is Photo -> println("photo:  $attach")
-                                is VikiPage -> println("viki page:  $attach")
-                                is Video -> println("video:  $attach")
-                                is Graffiti -> println("graffiti:  $attach")
+                                is AttachAudio -> println("audio:  $attach")
+                                is AttachPhoto -> println("photo:  $attach")
+                                is AttachVikiPage -> println("viki page:  $attach")
+                                is AttachVideo -> println("video:  $attach")
+                                is AttachGraffiti -> println("graffiti:  $attach")
                             }
                     }
                 }
