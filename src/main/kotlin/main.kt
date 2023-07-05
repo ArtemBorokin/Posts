@@ -113,29 +113,29 @@ data class Post(
 )
 
 //interface Attachments {
-abstract class Attachments
+abstract class Attachments(val type: String)
 
-data class AttachPhoto(
-    val type: String = "photo",
-    val photo: Photo
-) : Attachments()
+//data class AttachPhoto(
+    //val type: String = "photo",
+    //val photo: Photo
+//) : Attachments("photo")
 
 data class Photo(
     val id: Int, //Идентификатор фотографии.
     val ownerId: Int, //Идентификатор владельца фотографии.
     val photo130: String, //URL изображения для предпросмотра.
     val photo604: String, //URL полноразмерного изображения.
-    val photo: AttachPhoto = AttachPhoto()
-) {
+    //val photo: AttachPhoto
+) : Attachments("photo") {
     override fun toString(): String {
-        return "type: ${photo.type}, id: $id, photo130: $photo130, photo604: $photo604"
+        return "id: $id, photo130: $photo130, photo604: $photo604"
     }
 }
 
-data class AttachAudio(
-    val type: String = "audio",
-    val audio: Audio
-) : Attachments()
+//data class AttachAudio(
+    //val type: String = "audio",
+    //val audio: Audio
+//) : Attachments("audio")
 
 data class Audio(
     val id: Int, //Идентификатор аудиозаписи.
@@ -150,17 +150,17 @@ data class Audio(
     val date: Int, //Дата добавления.
     val noSearch: Boolean, //если включена опция «Не выводить при поиске». Если опция отключена, поле не возвращается.
     val isHq: Boolean, // если аудио в высоком качестве.
-    val audio: AttachAudio = AttachAudio()
-) : Attachments() {
+    //val audio: AttachAudio
+) : Attachments("audio") {
     override fun toString(): String {
-        return "type: ${audio.type}, id: $id, artist: $artist, title: $title"
+        return "id: $id, artist: $artist, title: $title"
     }
 }
 
-data class AttachVideo(
-    val type: String = "video",
-    val video: Video
-) : Attachments()
+//data class AttachVideo(
+    //val type: String = "video",
+    //val video: Video
+//) : Attachments("video")
 
 data class Video(
     val id: Int, //видеозаписи
@@ -171,43 +171,43 @@ data class Video(
     val date: Int, //Дата создания видеозаписи в формате Unixtime.
     val comments: Int, //Количество комментариев к видеозаписи.
     val isPrivate: Boolean = true, //Поле возвращается, если видеозапись приватная (например, была загружена в личное сообщение), всегда содержит 1.
-    val video: AttachVideo = AttachVideo()
-) : Attachments() {
+    //val video: AttachVideo
+) : Attachments(("video")) {
     override fun toString(): String {
-        return "type: ${video.type}, id: $id, title: $title, description: $description"
+        return "id: $id, title: $title, description: $description"
     }
 }
 
-data class AttachGraffiti(
-    val type: String = "graffiti",
-    val graffiti: Graffiti
-) : Attachments()
+//data class AttachGraffiti(
+    //val type: String = "graffiti",
+    //val graffiti: Graffiti
+//) : Attachments("audio")
 
 data class Graffiti(
     val id: Int, //идентификатор граффити
     val ownerId: Int, //Идентификатор автора граффити.
     val photo130: String, //URL изображения для предпросмотра.
     val photo604: String, //URL полноразмерного изображения.
-    val graffiti: AttachGraffiti = AttachGraffiti()
-) : Attachments() {
+    //val graffiti: AttachGraffiti
+) : Attachments("graffiti") {
     override fun toString(): String {
-        return "type: ${graffiti.type}, id: $id, photo130: $photo130, photo604: $photo604"
+        return "id: $id, photo130: $photo130, photo604: $photo604"
     }
 }
 
-data class AttachVikiPage(
-    val type: String = "page",
-    val vikiPage: VikiPage
-) : Attachments()
+//data class AttachVikiPage(
+    //val type: String = "page",
+    //val vikiPage: VikiPage
+//) : Attachments("vikipage")
 
 data class VikiPage(
     val id: Int, //идентификатор вики-страницы.
-    val vikiPage: AttachVikiPage = AttachVikiPage(),
+    //val vikiPage: AttachVikiPage,
     val groupId: Int, //Идентификатор группы, которой принадлежит вики-страница.
     val title: String //Название вики-страницы.
-) : Attachments() {
+) : Attachments("vikipage") {
     override fun toString(): String {
-        return "type: ${vikiPage.type}, id: $id, title: $title"
+        return "id: $id, title: $title"
     }
 }
 
