@@ -1,64 +1,8 @@
 package ru.netology
 
 fun main() {
-    //проверка лайков
-    val post = Post(
-        authorId = 1,
-        authorName = "Alex",
-        text = "dsgssdgedgbdbed",
-        original = null,
-        comments = null,
-        reposts = null,
-        copyHistory = null
-    )
-    WallService.add(post)
-    val post1 = Post(
-        authorId = 35,
-        authorName = "Petrovych",
-        text = "sldg elrbjl trjbn khtkj gskul",
-        original = null,
-        comments = null,
-        reposts = null,
-        copyHistory = null
-    )
-    var post2 = Post(
-        authorId = 12,
-        authorName = "Kolya Usypov",
-        text = "Привет",
-        comments = null,
-        original = post1,
-        reposts = null,
-        copyHistory = null
-    )
-    WallService.add(post1)
 
-    WallService.likeById(post1.id)
-    WallService.likeById(post1.id)
-    WallService.likeById(post2.id)
-    WallService.likeById(post1.id)
-    WallService.likeById(post1.id)
-
-    //println(WallService.getPostString())
-
-
-    println("----------------------")
-    //println(WallService.getPostString())
-
-    WallService.add(post2)
-    WallService.likeById(post2.id)
-    WallService.likeById(post1.id)
-    println("----------------------")
-    //WallService.getPostString()
-
-    var attach: Array<Attachments> = emptyArray()
-    attach += AttachAudio(1, 1, "Pevec", "title", 305, "url", 5, 2, 3, 0, false, true)
-
-    attach += AttachPhoto(3, 5, "130", "604")
-
-    WallService.update(post2.copy(attachments = attach))
-    //WallService.getPostString(post2.id)
-
-    WallService.getPostAttach(post2.id)
+    testNotes()
 
 }
 
@@ -109,35 +53,33 @@ data class Post(
     val friendsOnly: Boolean = false,
     val canPin: Boolean = false,
     val canEdit: Boolean = true,
-    val attachments: Array<Attachments> = emptyArray()
+    val attachments: Array<Attachments> = emptyArray(),
 )
 
 //interface Attachments {
-abstract class Attachments(val type: String)
+abstract class Attachments
 
-//data class AttachPhoto(
-    //val type: String = "photo",
-    //val photo: Photo
-//) : Attachments("photo")
+class AttachPhoto(
+    val type: String = "photo",
+)
 
-data class AttachPhoto(
+class Photo(
     val id: Int, //Идентификатор фотографии.
     val ownerId: Int, //Идентификатор владельца фотографии.
     val photo130: String, //URL изображения для предпросмотра.
     val photo604: String, //URL полноразмерного изображения.
-    //val photo: AttachPhoto
-) : Attachments("photo") {
+    val photo: AttachPhoto = AttachPhoto(),
+) : Attachments() {
     override fun toString(): String {
-        return "id: $id, photo130: $photo130, photo604: $photo604"
+        return "type: ${photo.type}, id: $id, photo130: $photo130, photo604: $photo604"
     }
 }
 
-//data class AttachAudio(
-    //val type: String = "audio",
-    //val audio: Audio
-//) : Attachments("audio")
+class AttachAudio(
+    val type: String = "audio",
+)
 
-data class AttachAudio(
+class Audio(
     val id: Int, //Идентификатор аудиозаписи.
     val ownerId: Int, //Идентификатор владельца аудиозаписи.
     val artist: String, //Исполнитель
@@ -150,19 +92,18 @@ data class AttachAudio(
     val date: Int, //Дата добавления.
     val noSearch: Boolean, //если включена опция «Не выводить при поиске». Если опция отключена, поле не возвращается.
     val isHq: Boolean, // если аудио в высоком качестве.
-    //val audio: AttachAudio
-) : Attachments("audio") {
+    val audio: AttachAudio = AttachAudio(),
+) : Attachments() {
     override fun toString(): String {
-        return "id: $id, artist: $artist, title: $title"
+        return "type: ${audio.type}, id: $id, artist: $artist, title: $title"
     }
 }
 
-//data class AttachVideo(
-    //val type: String = "video",
-    //val video: Video
-//) : Attachments("video")
+class AttachVideo(
+    val type: String = "video",
+)
 
-data class AttachVideo(
+open class Video(
     val id: Int, //видеозаписи
     val ownerId: Int, //Идентификатор владельца видеозаписи.
     val title: String, //Название видеозаписи.
@@ -171,43 +112,41 @@ data class AttachVideo(
     val date: Int, //Дата создания видеозаписи в формате Unixtime.
     val comments: Int, //Количество комментариев к видеозаписи.
     val isPrivate: Boolean = true, //Поле возвращается, если видеозапись приватная (например, была загружена в личное сообщение), всегда содержит 1.
-    //val video: AttachVideo
-) : Attachments(("video")) {
+    val video: AttachVideo = AttachVideo(),
+) : Attachments() {
     override fun toString(): String {
-        return "id: $id, title: $title, description: $description"
+        return "type: ${video.type}, id: $id, title: $title, description: $description"
     }
 }
 
-//data class AttachGraffiti(
-    //val type: String = "graffiti",
-    //val graffiti: Graffiti
-//) : Attachments("audio")
+class AttachGraffiti(
+    val type: String = "graffiti",
+)
 
-data class AttachGraffiti(
+class Graffiti(
     val id: Int, //идентификатор граффити
     val ownerId: Int, //Идентификатор автора граффити.
     val photo130: String, //URL изображения для предпросмотра.
     val photo604: String, //URL полноразмерного изображения.
-    //val graffiti: AttachGraffiti
-) : Attachments("graffiti") {
+    val graffiti: AttachGraffiti = AttachGraffiti(),
+) : Attachments() {
     override fun toString(): String {
-        return "id: $id, photo130: $photo130, photo604: $photo604"
+        return "type: ${graffiti.type}, id: $id, photo130: $photo130, photo604: $photo604"
     }
 }
 
-//data class AttachVikiPage(
-    //val type: String = "page",
-    //val vikiPage: VikiPage
-//) : Attachments("vikipage")
+class AttachVikiPage(
+    val type: String = "page",
+)
 
-data class AttachVikiPage(
+open class VikiPage(
     val id: Int, //идентификатор вики-страницы.
-    //val vikiPage: AttachVikiPage,
+    val vikiPage: AttachVikiPage = AttachVikiPage(),
     val groupId: Int, //Идентификатор группы, которой принадлежит вики-страница.
-    val title: String //Название вики-страницы.
-) : Attachments("vikipage") {
+    val title: String, //Название вики-страницы.
+) : Attachments() {
     override fun toString(): String {
-        return "id: $id, title: $title"
+        return "type: ${vikiPage.type}, id: $id, title: $title"
     }
 }
 
@@ -216,26 +155,26 @@ data class Donut(
     var paidDuration: Int = 100,
     var canPublishFreeCopy: Boolean = true,
     val placeholder: Placeholder = Placeholder(),
-    var editMode: String = "duration"
+    var editMode: String = "duration",
 )
 
 data class Placeholder(
-    var name: String = "Смотрим на меня"
+    var name: String = "Смотрим на меня",
 )
 
 data class Reposts(
     var count: Int = 0,
-    var userReposted: Boolean = false
+    var userReposted: Boolean = false,
 )
 
 data class Geo(
     val type: String = "", //Фонтан
     val coordinates: String = "", //"56.008772, 92.870401"
-    val place: Places = Places()
+    val place: Places = Places(),
 )
 
 data class Places(
-    val name: String = ""//"Главный фонтан на Театральной площади г. Красноярска"
+    val name: String = "",//"Главный фонтан на Театральной площади г. Красноярска"
 )
 
 data class Comments(
@@ -243,36 +182,470 @@ data class Comments(
     var canPost: Boolean = true,
     var groupsCanPost: Boolean = true,
     var canClose: Boolean = false,
-    var canOpen: Boolean = true
+    var canOpen: Boolean = true,
 )
 
 data class Copyright(
     val id: Int = 0, //тупо 0 потому что мы всего-лишьи имитируем ссылку извне
     val link: String = "",
     val name: String = "",
-    val type: String = ""
+    val type: String = "",
 )
-
 
 data class Views(var count: Int = 0)
 
 data class CopyHistory(
-    var posts: Array<Post> = emptyArray()
+    var posts: Array<Post> = emptyArray(),
 )
 
 data class Likes(
     var count: Int = 0,
     var userLikes: Boolean = false,
-    var canLike: Boolean = true
+    var canLike: Boolean = true,
 )
+
+data class Comment(
+    val id: Int, //Идентификатор комментария.
+    val fromId: Int, //Идентификатор автора комментария.
+    val date: Int, //Дата создания комментария в формате Unixtime.
+    val text: String,
+    val parentsStack: Array<Int> = emptyArray(), //Массив идентификаторов родительских комментариев.
+    val attachments: Array<Attachments> = emptyArray(),
+)
+
+class PostNotFoundException(message: String): RuntimeException(message)
+
+data class NotesAndComment<A, B>(
+    var first: A,
+    var second: B,
+)
+
+fun testNotes() {
+    val user = Users(1, "Alex");
+    val user1 = Users(12, "Petya");
+    val user2 = Users(35, "Kolya");
+
+    val note1 = NotesService.add(user.id, "title1", "text1")
+    val note11 = NotesService.add(user.id, "title11", "text111")
+    val note111 = NotesService.add(user.id, "title111", "text111")
+
+
+    val note2 = NotesService.add(user1.id, "title2", "text2")
+    val note22 = NotesService.add(user1.id, "title22", "text22")
+    val note222 = NotesService.add(user1.id, "title222", "text222")
+
+
+    val testId1 = NotesService.add(user2.id, "title1", "text1")
+    val testId11 = NotesService.add(user2.id,"title11", "text111")
+    val testId111 = NotesService.add(user2.id,"title111", "text111")
+
+
+    val comment7 = NotesService.createComment(note11, user1.id, "Комментарий не изменённый 7")
+    val comment81 = NotesService.createComment(note111, user.id, "Комментарий не изменённый 8 первый")
+    val comment82 = NotesService.createComment(note111, user.id, "Комментарий не изменённый 8 второй")
+
+    //println(NotesService.notesToString())
+
+    //NotesService.deleteComment(comment81, user.id)
+    //println(NotesService.notesToString())
+
+    NotesService.delete(note11)
+    //println(NotesService.notesToString())
+
+    NotesService.edit(user.id, note111, "Новый заголовок", "Комментарий 1 второй")
+    //println(NotesService.notesToString())
+
+    NotesService.deleteComment(comment82, user.id)
+    NotesService.restoreComment(comment82)
+    println(NotesService.notesToString())
+    //println(NotesService.getComments(note11, user1.id))
+
+
+}
+
+//Первое вложение User и List
+// в Liste Заметки пользователя и Комментарии к заметкам пользователя
+// также есть List с удалёнными заметками и комментариями
+
+class Users(
+    val id: Int,
+    val name: String
+)
+
+class Notes(
+    val fromId: Int, //Идентификатор автора заметки. Users.id
+    val title: String, //Заголовок заметки.
+    val text: String, // Текст заметки.
+    val nid: String = CorrectId.getNewId(0).toString() // Идентификатор заметки
+) {
+
+    override fun toString(): String {
+        return " Заметка id $nid заголовок: $title текст: $text пользователь ид: $fromId"
+    }
+    override fun hashCode(): Int {
+        return nid.hashCode()
+    }
+
+    fun equals(obj: Notes): Boolean {
+        val tmpNotes: Notes = obj as Notes? ?: return false
+        return tmpNotes.nid == nid
+    }
+}
+
+class NotesComment(
+    val noteId: String, //Идентификатор заметки.
+    val userId: Int,
+    val message: String, //Текст комментария.
+    val cid: String = CorrectId.getNewId(0).toString() // Уникальный идентификатор комментария
+) {
+    override fun toString(): String {
+        return " Комментарий id $cid ид Заметки: $noteId текст: $message пользователь ид: $userId"
+    }
+}
+
+object NotesService {
+    private var notes: MutableList<NotesAndComment<Int, MutableList<Notes>>> = mutableListOf() // id пользователя и список Заметок
+    private var delNotes: MutableList<NotesAndComment<Int, MutableList<Notes>>> = mutableListOf()
+    private var comments: MutableList<NotesAndComment<Int, MutableList<NotesComment>>> = mutableListOf() // id заметки и список комментариев
+    private var delComments: MutableList<NotesAndComment<Int, MutableList<NotesComment>>> = mutableListOf()
+
+    fun clear() {
+        CorrectId.clearId()
+        notes = mutableListOf()
+        delNotes = mutableListOf()
+        comments = mutableListOf()
+        delComments = mutableListOf()
+    }
+
+    fun add(userId: Int, title: String, text: String): String {
+        val note = Notes(userId, title, text)
+        val indexList = getIndexUser(userId)
+
+        when(indexList.size) {
+            0 -> {
+                notes.add(NotesAndComment(userId, mutableListOf(note)))
+                return notes.last().second.last().nid //если находим такую же заметку то возвращаем её ид (можно усложнить)
+            }
+
+            1 -> {
+                notes[indexList[0]].second.add(note)
+                return notes[indexList[0]].second.last().nid
+            }
+        }
+
+        return note.nid
+
+    }
+
+    fun delete(noteId: String): Boolean {
+
+        val indexList = getIndexUser(noteId = noteId)
+        val indexComment = getIndexNoteComment(noteId.toInt())
+        if (indexComment.size > 0) {
+            //при удалении замеки удаляем комментарии без возможности восстановить
+            comments[indexComment[0]].second.clear()
+        }
+
+        return when (indexList.size) {
+            3 -> {
+                //если существует индекс юзера в удалённых - добавляем его
+                //иначе вставляем в существующий
+                val indexListDel = getIndexUser(indexList[2], type = "delNotes")
+                if (indexListDel.size == 1) {
+                    delNotes[indexListDel[0]].second.add(notes[indexList[0]].second.removeAt(indexList[1]))
+                    true
+                } else {
+                    delNotes.add(NotesAndComment(indexList[2], mutableListOf(notes[indexList[0]].second.removeAt(indexList[1]))))
+                    true
+                }
+
+            } else -> false
+        }
+
+    }
+
+    fun edit(userId: Int, noteId: String, title: String, text: String): Boolean {
+        val indexList = getIndexUser(noteId = noteId) //userId = userId,
+
+        return when (indexList.size) {
+            3 -> {
+                //нашёл все индексы, можем менять
+                var tmpNotes: Notes = Notes(userId, title, text, nid = noteId)
+                notes[indexList[0]].second.removeAt(indexList[1])
+                notes[indexList[0]].second.add(tmpNotes)
+                true
+            }
+
+            else -> false //либо не нашёл, либо ошибка
+        }
+
+    }
+
+    fun get(noteId: String): MutableList<Notes> {
+
+        var tmpNotes: MutableList<Notes> = mutableListOf()
+        val indexList = getIndexUser(noteId = noteId)
+
+        when (indexList.size) {
+            3 -> {
+                tmpNotes.add(notes[indexList[0]].second[indexList[1]])
+            }
+            else -> {
+                return tmpNotes
+            }
+
+        }
+
+        return tmpNotes
+    }
+
+    //функция динамическая, возвращает список ID вхождения по пользователю
+    //или по пользователю и заметке
+    //может искать как в notes действующих так и в удалённых
+    private fun getIndexUser(userId: Int = -1, noteId: String = "", type: String = "notes"): MutableList<Int> {
+        var tmpList: MutableList<Int> = mutableListOf()
+        // 0 - index user
+        // 1 - index note or no
+        // 2 - userId
+        val note: MutableList<NotesAndComment<Int, MutableList<Notes>>> = if (type == "notes") notes else delNotes
+
+        for ((index, userNote) in note.withIndex()) {
+
+            if (userId == -1 && noteId != "") {
+                for ((indexNote, noteTmp) in note[index].second.withIndex()) {
+                    if (noteId == noteTmp.nid) {
+                        tmpList.add(index)
+                        tmpList.add(indexNote)
+                        tmpList.add(note[index].first)
+                        return tmpList
+                    }
+                }
+            }
+
+            if (userId == userNote.first && noteId == "") {
+                tmpList.add(index)
+                return tmpList
+            } else if (userId == userNote.first && noteId != "") {
+                for ((indexNote, noteTmp) in note[index].second.withIndex()) {
+                    if (noteId == noteTmp.nid) tmpList.add(index, indexNote)
+                }
+                return tmpList
+            }
+
+        }
+
+        return tmpList
+    }
+
+    private fun getIndexNoteComment(id: Int = -1, cid: String = "", type: String = "comments"): MutableList<Int> {
+        var tmpList: MutableList<Int> = mutableListOf()
+
+        // 0 - index Note
+        // 1 - index comment or no
+        // 2 - id Note
+
+        val comment: MutableList<NotesAndComment<Int, MutableList<NotesComment>>> = if (type == "comments") comments else delComments
+
+        for ((index, idNoteComment) in comment.withIndex()) {
+
+            if (id == -1 && cid != "") {
+                for ((indexComment, commentTmp) in comment[index].second.withIndex()) {
+                    if (cid == commentTmp.cid) {
+                        tmpList.add(index)
+                        tmpList.add(indexComment)
+                        tmpList.add(comment[index].first)
+                        return tmpList
+                    }
+                }
+            }
+
+            if (id == idNoteComment.first && cid == "") {
+                tmpList.add(index)
+                return tmpList
+            } else if (id == idNoteComment.first && cid != "") {
+                tmpList.add(index)
+                for ((indexNote, noteTmp) in comment[index].second.withIndex()) {
+                    if (cid == noteTmp.cid) tmpList.add(indexNote)
+                }
+                return tmpList
+            }
+
+        }
+
+        return tmpList
+    }
+
+    fun createComment(noteId: String, userId: Int, message: String): String {
+        val comment = NotesComment(noteId, userId, message)
+        val indexList = getIndexNoteComment(noteId.toInt())
+
+        when(indexList.size) {
+            0 -> {
+                comments.add(NotesAndComment(noteId.toInt(), mutableListOf(comment)))
+                return comments.last().second.last().cid //если находим такую же заметку то возвращаем её ид (можно усложнить)
+            }
+
+            1 -> {
+                comments[indexList[0]].second.add(comment)
+                return comments[indexList[0]].second.last().cid
+            }
+        }
+
+        return comment.cid
+    }
+
+    fun deleteComment(cid: String, userId: Int): Boolean {
+
+        val indexList = getIndexNoteComment(cid = cid)
+
+        return when (indexList.size) {
+            3 -> {
+                val indexListDel = getIndexNoteComment(indexList[2], cid = cid, type = "delComments")
+                //если существует индекс заметки - добавляем к нему, или же создаём новый
+                if (indexListDel.size == 0) {
+                    delComments.add(NotesAndComment(indexList[2], mutableListOf(comments[indexList[0]].second.removeAt(indexList[1]))))
+                    return true
+                } else {
+                    delComments[indexListDel[0]].second.add(comments[indexList[0]].second.removeAt(indexList[1]))
+                    return true
+                }
+            } else -> return false
+        }
+
+    }
+
+    fun editComment(cid: String, userId: Int, message: String): Boolean {
+        val indexList = getIndexNoteComment(cid = cid)
+
+        return when (indexList.size) {
+            3 -> {
+                //нашёл все индексы, можем менять
+                if (comments[indexList[0]].second[indexList[1]].userId == userId) {
+                    var tmpNotes: NotesComment = NotesComment(indexList[2].toString(), userId, message, cid)
+                    comments[indexList[0]].second.removeAt(indexList[1])
+                    comments[indexList[0]].second.add(tmpNotes)
+                    true
+                } else {
+                    false
+                }
+
+            }
+
+            else -> false //либо не нашёл, либо ошибка
+        }
+    }
+
+    fun restoreComment(cid: String): Boolean {
+        val indexListDel = getIndexNoteComment(cid = cid, type = "delComments")
+
+        when (indexListDel.size) {
+            3 -> {
+                //сначала ищем позицию самой заметки, чтобы проверить, не удалена ли она
+                val indexNote = getIndexUser(noteId = indexListDel[2].toString())
+
+                if (indexNote.size > 1) {
+                    //смотрим индекс Заметки в комментариях
+                    val indexListComment = getIndexNoteComment(id = indexListDel[2])
+                    //если существует индекс комментария - добавляем к нему
+                    if (indexListComment.size == 0) {
+                        comments.add(NotesAndComment(indexListDel[2], mutableListOf(delComments[indexListDel[0]].second.removeAt(indexListDel[1]))))
+                        return true
+                    } else {
+                        comments[indexListComment[0]].second.add(delComments[indexListDel[0]].second.removeAt(indexListDel[1]))
+                        return true
+                    }
+                } else {
+                    //значит заметка удалена и не надо восстанавливать Комментарий
+                    return false
+                }
+
+            } else -> return false
+        }
+
+        return false
+    }
+
+    fun getComments(noteId: String, userId: Int): MutableList<NotesComment>  {
+
+        var tmpNotes: MutableList<NotesComment> = mutableListOf()
+        val indexList = getIndexNoteComment(id = noteId.toInt())
+
+        return when (indexList.size) {
+            1 -> {
+                for ((indexCom, commentUser) in comments[indexList[0]].second.withIndex()) {
+                    if (userId == commentUser.userId) {
+                        tmpNotes.add(comments[indexList[0]].second[indexCom])
+                    }
+                }
+                /*for (commentUser in comments[indexList[0]].second) {
+                    if (userId == commentUser.userId) {
+                        tmpNotes.add(commentUser)
+                    }
+                }*/
+                tmpNotes
+            }
+            else -> {
+                tmpNotes
+            }
+
+        }
+
+    }
+
+    fun notesToString() {
+        println("------------------------------")
+        println("Заметки")
+        for (note in notes) {
+            for (noteIn in note.second) {
+                println(noteIn.toString())
+            }
+        }
+
+        println("------------------------------")
+        println("Удалённые заметки")
+        for (delNote in delNotes) {
+            for (delNoteIn in delNote.second) {
+                println(delNoteIn.toString())
+            }
+        }
+
+        println("------------------------------")
+        println("Комментарии")
+        for (tmp in comments) {
+            for (tmpIn in tmp.second) {
+                println(tmpIn.toString())
+            }
+        }
+
+        println("------------------------------")
+        println("Удалённые комментарии")
+        for (tmp in delComments) {
+            for (tmpIn in tmp.second) {
+                println(tmpIn.toString())
+            }
+        }
+    }
+}
 
 object WallService {
     private var posts = emptyArray<Post>()
+    private var comments = emptyArray<Comment>()
 
-    fun getPostString(id: Int = 0) {
-        when (id) {
+    fun createComment(postId: Int, comment: Comment): Comment {
+        for (i in posts) {
+            if (i.id == postId) {
+                comments += comment
+                return comments.last()
+            }
+        }
+        throw PostNotFoundException("no post with id: $postId")
+
+    }
+
+    fun getPostString(postId: Int = 0) {
+        when (postId) {
             0 -> for (i in posts) println(i.toString())
-            else -> for (i in posts) if (i.id == id) println(i.toString())
+            else -> for (i in posts) if (i.id == postId) println(i.toString())
         }
 
     }
@@ -287,22 +660,21 @@ object WallService {
         return posts.last()
     }
 
-    fun getPostAttach(id: Int) {
-        when (id) {
+    fun getPostAttach(postId: Int) {
+        when (postId) {
             0 -> {
                 println("У вас отсутствует корректный id поста.")
             }
-
             else -> {
                 for (i in posts) {
-                    if (i.id == id) {
+                    if (i.id == postId) {
                         for (attach in i.attachments)
                             when (attach) {
-                                is AttachAudio -> println("audio:  $attach")
-                                is AttachPhoto -> println("photo:  $attach")
-                                is AttachVikiPage -> println("viki page:  $attach")
-                                is AttachVideo -> println("video:  $attach")
-                                is AttachGraffiti -> println("graffiti:  $attach")
+                                is Audio -> println("audio:  $attach")
+                                is Photo -> println("photo:  $attach")
+                                is VikiPage -> println("viki page:  $attach")
+                                is Video -> println("video:  $attach")
+                                is Graffiti -> println("graffiti:  $attach")
                             }
                     }
                 }
@@ -314,19 +686,17 @@ object WallService {
     fun update(post: Post): Boolean {
         for ((index, i) in posts.withIndex()) {
             if (i.id == post.id) {
-                posts[index] = post.copy(
-                    authorName = post.authorName, text = post.text, likes = i.likes, friendsOnly = post.friendsOnly,
-                    canPin = post.canPin, canEdit = post.canEdit
-                )
+                posts[index] = post.copy(authorName = post.authorName, text = post.text, likes = i.likes, friendsOnly = post.friendsOnly,
+                    canPin = post.canPin, canEdit = post.canEdit)
                 return true
             }
         }
         return false
     }
 
-    fun likeById(id: Int) {
+    fun likeById(postId: Int) {
         for ((index, post) in posts.withIndex()) {
-            if (post.id == id) {
+            if (post.id == postId) {
                 posts[index] = post.copy(likes = Likes(post.likes.count + 1, post.likes.userLikes, post.likes.canLike))
             }
         }
